@@ -3,7 +3,30 @@ set -euo pipefail
 
 # ─────────────────────────────────────────────
 #  Dotfiles installer — macOS (brew) & Ubuntu
+#
+#  원라인 설치 (curl로 직접 실행):
+#    bash <(curl -fsSL https://raw.githubusercontent.com/nn1a/dotfiles/main/install.sh)
+#
+#  또는 clone 후 실행:
+#    git clone https://github.com/nn1a/dotfiles.git ~/dotfiles
+#    bash ~/dotfiles/install.sh
 # ─────────────────────────────────────────────
+
+DOTFILES_REPO="https://github.com/nn1a/dotfiles.git"
+DOTFILES_TARGET="$HOME/dotfiles"
+
+# curl로 직접 실행된 경우 ($0 가 /dev/fd/... 또는 bash) 먼저 clone
+if [[ "${BASH_SOURCE[0]}" != "$DOTFILES_TARGET/install.sh" ]] && \
+   [[ ! -f "${BASH_SOURCE[0]%/*}/nvim/init.lua" ]]; then
+  echo "Cloning dotfiles into $DOTFILES_TARGET ..."
+  if [ -d "$DOTFILES_TARGET" ]; then
+    echo "  $DOTFILES_TARGET already exists — pulling latest"
+    git -C "$DOTFILES_TARGET" pull --ff-only
+  else
+    git clone --depth=1 "$DOTFILES_REPO" "$DOTFILES_TARGET"
+  fi
+  exec bash "$DOTFILES_TARGET/install.sh" "$@"
+fi
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NVIM_VERSION="0.12.3"   # bump here when upgrading
