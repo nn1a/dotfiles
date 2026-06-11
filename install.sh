@@ -154,9 +154,17 @@ install_deps_macos() {
   brew_install ripgrep
   brew_install fd
   brew_install lazygit
-  brew_install node       # for many LSP servers
+  brew_install node       # for LSP servers and tree-sitter-cli
   brew_install python3
   brew_install go
+
+  # tree-sitter CLI — required by nvim-treesitter v2 to compile parsers
+  if ! cmd_exists tree-sitter; then
+    info "Installing tree-sitter-cli via npm"
+    npm install -g tree-sitter-cli
+  else
+    success "tree-sitter CLI already installed"
+  fi
 }
 
 install_deps_debian() {
@@ -209,7 +217,7 @@ install_deps_debian() {
     success "lazygit already installed"
   fi
 
-  # Node.js (for LSP servers)
+  # Node.js (for LSP servers and tree-sitter-cli)
   if ! cmd_exists node; then
     info "Installing Node.js via NodeSource"
     curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
@@ -217,11 +225,24 @@ install_deps_debian() {
   else
     success "Node.js already installed ($(node --version))"
   fi
+
+  # tree-sitter CLI — required by nvim-treesitter v2 to compile parsers
+  if ! cmd_exists tree-sitter; then
+    info "Installing tree-sitter-cli via npm"
+    npm install -g tree-sitter-cli
+  else
+    success "tree-sitter CLI already installed"
+  fi
 }
 
 install_deps_fedora() {
   step "Installing dependencies (Fedora)"
-  sudo dnf install -y git curl wget unzip gcc make python3 python3-pip ripgrep fd-find nodejs
+  sudo dnf install -y git curl wget unzip gcc make python3 python3-pip ripgrep fd-find nodejs npm
+
+  if ! cmd_exists tree-sitter; then
+    info "Installing tree-sitter-cli via npm"
+    npm install -g tree-sitter-cli
+  fi
 
   if ! cmd_exists lazygit; then
     info "Installing lazygit"
@@ -233,6 +254,11 @@ install_deps_fedora() {
 install_deps_arch() {
   step "Installing dependencies (Arch)"
   sudo pacman -S --noconfirm git curl wget unzip base-devel python python-pip ripgrep fd lazygit nodejs npm
+
+  if ! cmd_exists tree-sitter; then
+    info "Installing tree-sitter-cli via npm"
+    npm install -g tree-sitter-cli
+  fi
 }
 
 # ── Fonts ────────────────────────────────────

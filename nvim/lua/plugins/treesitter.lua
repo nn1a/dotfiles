@@ -8,7 +8,8 @@ return {
     config = function()
       require("nvim-treesitter").setup({})
 
-      -- Install parsers asynchronously on startup
+      -- Install missing parsers; :wait() makes it synchronous so parsers
+      -- are ready before the first buffer opens (important on a fresh machine)
       require("nvim-treesitter").install({
         "lua", "vim", "vimdoc", "bash",
         "python", "javascript", "typescript", "tsx",
@@ -16,7 +17,7 @@ return {
         "markdown", "markdown_inline",
         "go", "rust", "c", "cpp",
         "dockerfile", "gitignore",
-      })
+      }):wait(300000)
     end,
   },
 
