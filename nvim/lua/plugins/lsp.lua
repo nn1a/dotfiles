@@ -12,13 +12,15 @@ return {
     opts = {
       ensure_installed = {
         "lua_ls",
-        "pyright",
+        "pyright",  -- Python type checking
+        "ruff",     -- Python lint + format (replaces flake8/black/isort)
         "ts_ls",
         "html",
         "cssls",
         "jsonls",
         "bashls",
         "gopls",
+        -- rust_analyzer is managed by rustup, not mason (see plugins/rust.lua)
       },
       -- nvim 0.11+: automatic_enable replaces automatic_installation
       automatic_enable = true,
@@ -47,6 +49,29 @@ return {
             telemetry = { enable = false },
           },
         },
+      })
+
+      -- pyright handles type checking only; ruff handles diagnostics + formatting
+      vim.lsp.config("pyright", {
+        settings = {
+          pyright = {
+            disableOrganizeImports = true, -- ruff handles imports
+          },
+          python = {
+            analysis = {
+              ignore = { "*" }, -- ruff handles lint diagnostics
+              typeCheckingMode = "standard",
+            },
+          },
+        },
+      })
+
+      -- ruff LSP: diagnostics and code actions (format via conform instead)
+      vim.lsp.config("ruff", {
+        on_attach = function(client, _)
+          -- Disable ruff hover in favor of pyright
+          client.server_capabilities.hoverProvider = false
+        end,
       })
 
       -- LSP keymaps — set only when LSP attaches to a buffer

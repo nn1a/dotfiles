@@ -165,6 +165,24 @@ install_deps_macos() {
   else
     success "tree-sitter CLI already installed"
   fi
+
+  # Rust toolchain (rustaceanvim uses rustup's rust-analyzer)
+  if ! cmd_exists rustup; then
+    info "Installing rustup"
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+    source "$HOME/.cargo/env"
+  else
+    success "rustup already installed"
+  fi
+  rustup component add rust-analyzer 2>/dev/null || true
+
+  # ruff — fast Python linter/formatter (Mason also installs it, but having
+  # the system binary lets you run ruff outside nvim)
+  if ! cmd_exists ruff; then
+    brew_install ruff
+  else
+    success "ruff already installed ($(ruff --version))"
+  fi
 }
 
 install_deps_debian() {
@@ -256,6 +274,24 @@ install_deps_debian() {
   else
     success "Go already installed ($(go version))"
   fi
+
+  # Rust toolchain
+  if ! cmd_exists rustup; then
+    info "Installing rustup"
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+    source "$HOME/.cargo/env"
+  else
+    success "rustup already installed"
+  fi
+  rustup component add rust-analyzer 2>/dev/null || true
+
+  # ruff (Python linter/formatter)
+  if ! cmd_exists ruff; then
+    info "Installing ruff via pip"
+    pip3 install --user ruff
+  else
+    success "ruff already installed"
+  fi
 }
 
 install_deps_fedora() {
@@ -272,16 +308,40 @@ install_deps_fedora() {
     sudo dnf copr enable atim/lazygit -y
     sudo dnf install -y lazygit
   fi
+
+  # Rust toolchain
+  if ! cmd_exists rustup; then
+    info "Installing rustup"
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+    source "$HOME/.cargo/env"
+  else
+    success "rustup already installed"
+  fi
+  rustup component add rust-analyzer 2>/dev/null || true
+
+  if ! cmd_exists ruff; then
+    pip3 install --user ruff
+  fi
 }
 
 install_deps_arch() {
   step "Installing dependencies (Arch)"
-  sudo pacman -S --noconfirm git curl wget unzip base-devel python python-pip ripgrep fd lazygit nodejs npm go
+  sudo pacman -S --noconfirm git curl wget unzip base-devel python python-pip ripgrep fd lazygit nodejs npm go ruff
 
   if ! cmd_exists tree-sitter; then
     info "Installing tree-sitter-cli via npm"
     npm install -g tree-sitter-cli
   fi
+
+  # Rust toolchain
+  if ! cmd_exists rustup; then
+    info "Installing rustup"
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+    source "$HOME/.cargo/env"
+  else
+    success "rustup already installed"
+  fi
+  rustup component add rust-analyzer 2>/dev/null || true
 }
 
 # ── Fonts ────────────────────────────────────
