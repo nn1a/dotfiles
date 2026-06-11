@@ -233,11 +233,34 @@ install_deps_debian() {
   else
     success "tree-sitter CLI already installed"
   fi
+
+  # Go — required for gopls LSP server
+  if ! cmd_exists go; then
+    info "Installing Go (latest stable)"
+    local arch
+    arch=$(uname -m)
+    local go_arch="amd64"
+    [ "$arch" = "aarch64" ] && go_arch="arm64"
+    local go_ver
+    go_ver=$(curl -s "https://go.dev/dl/?mode=json" | grep -o '"version":"go[^"]*"' | head -1 | grep -o 'go[0-9.]*')
+    curl -fsSL "https://dl.google.com/go/${go_ver}.linux-${go_arch}.tar.gz" -o /tmp/go.tar.gz
+    sudo rm -rf /usr/local/go
+    sudo tar -C /usr/local -xzf /tmp/go.tar.gz
+    rm /tmp/go.tar.gz
+    export PATH="$PATH:/usr/local/go/bin"
+    local shell_rc="$HOME/.bashrc"
+    [ -n "$ZSH_VERSION" ] && shell_rc="$HOME/.zshrc"
+    grep -q '/usr/local/go/bin' "$shell_rc" 2>/dev/null || \
+      echo 'export PATH="$PATH:/usr/local/go/bin"' >> "$shell_rc"
+    success "Go installed: $(go version)"
+  else
+    success "Go already installed ($(go version))"
+  fi
 }
 
 install_deps_fedora() {
   step "Installing dependencies (Fedora)"
-  sudo dnf install -y git curl wget unzip gcc make python3 python3-pip ripgrep fd-find nodejs npm
+  sudo dnf install -y git curl wget unzip gcc make python3 python3-pip ripgrep fd-find nodejs npm golang
 
   if ! cmd_exists tree-sitter; then
     info "Installing tree-sitter-cli via npm"
@@ -253,7 +276,7 @@ install_deps_fedora() {
 
 install_deps_arch() {
   step "Installing dependencies (Arch)"
-  sudo pacman -S --noconfirm git curl wget unzip base-devel python python-pip ripgrep fd lazygit nodejs npm
+  sudo pacman -S --noconfirm git curl wget unzip base-devel python python-pip ripgrep fd lazygit nodejs npm go
 
   if ! cmd_exists tree-sitter; then
     info "Installing tree-sitter-cli via npm"
