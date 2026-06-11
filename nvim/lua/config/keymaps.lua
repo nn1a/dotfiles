@@ -59,15 +59,11 @@ map("n", "<leader>fc", "<cmd>Telescope colorscheme<cr>", { desc = "Colorscheme" 
 map("n", "<leader>e", "<cmd>Neotree toggle<cr>", { desc = "Toggle file explorer" })
 map("n", "<leader>o", "<cmd>Neotree focus<cr>", { desc = "Focus file explorer" })
 
--- LSP (set in lsp config but listed here for reference)
-map("n", "K", vim.lsp.buf.hover, { desc = "LSP hover" })
-map("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
-map("n", "gr", vim.lsp.buf.references, { desc = "Go to references" })
-map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
-map("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
+-- Diagnostics (always available, no LSP needed)
 map("n", "<leader>d", vim.diagnostic.open_float, { desc = "Show diagnostics" })
 map("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
 map("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+-- LSP keymaps are set per-buffer via LspAttach in plugins/lsp.lua
 
 -- Git (Gitsigns)
 map("n", "<leader>gh", "<cmd>Gitsigns preview_hunk<cr>", { desc = "Preview hunk" })

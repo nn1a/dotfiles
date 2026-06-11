@@ -8,7 +8,7 @@ return {
 
   {
     "williamboman/mason-lspconfig.nvim",
-    dependencies = { "williamboman/mason.nvim" },
+    dependencies = { "williamboman/mason.nvim", "neovim/nvim-lspconfig" },
     opts = {
       ensure_installed = {
         "lua_ls",
@@ -20,46 +20,26 @@ return {
         "bashls",
         "gopls",
       },
-      automatic_installation = true,
+      -- nvim 0.11+: automatic_enable replaces automatic_installation
+      automatic_enable = true,
     },
   },
 
-  -- LSP config
+  -- nvim-lspconfig: provides server definitions (cmd, filetypes, root patterns)
+  -- We do NOT call lspconfig[server].setup() — use vim.lsp.config() instead
   {
     "neovim/nvim-lspconfig",
-    dependencies = {
-      "williamboman/mason.nvim",
-      "williamboman/mason-lspconfig.nvim",
-      "hrsh7th/cmp-nvim-lsp",
-    },
+    dependencies = { "hrsh7th/cmp-nvim-lsp" },
     config = function()
-      local lspconfig = require("lspconfig")
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-      local on_attach = function(_, bufnr)
-        local opts = { buffer = bufnr }
-        vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-        vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-        vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-        vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-        vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-        vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-        vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-        vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, opts)
-      end
-
-      local servers = { "lua_ls", "pyright", "ts_ls", "html", "cssls", "jsonls", "bashls", "gopls" }
-      for _, server in ipairs(servers) do
-        lspconfig[server].setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-        })
-      end
-
-      -- Lua special config
-      lspconfig.lua_ls.setup({
+      -- Apply capabilities to all servers globally
+      vim.lsp.config("*", {
         capabilities = capabilities,
-        on_attach = on_attach,
+      })
+
+      -- Server-specific overrides
+      vim.lsp.config("lua_ls", {
         settings = {
           Lua = {
             diagnostics = { globals = { "vim" } },
@@ -67,6 +47,22 @@ return {
             telemetry = { enable = false },
           },
         },
+      })
+
+      -- LSP keymaps — set only when LSP attaches to a buffer
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("lsp_keymaps", { clear = true }),
+        callback = function(ev)
+          local opts = { buffer = ev.buf }
+          vim.keymap.set("n", "K",          vim.lsp.buf.hover,        vim.tbl_extend("force", opts, { desc = "LSP hover" }))
+          vim.keymap.set("n", "gd",         vim.lsp.buf.definition,   vim.tbl_extend("force", opts, { desc = "Go to definition" }))
+          vim.keymap.set("n", "gD",         vim.lsp.buf.declaration,  vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
+          vim.keymap.set("n", "gi",         vim.lsp.buf.implementation, vim.tbl_extend("force", opts, { desc = "Go to implementation" }))
+          vim.keymap.set("n", "gr",         vim.lsp.buf.references,   vim.tbl_extend("force", opts, { desc = "Go to references" }))
+          vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action,  vim.tbl_extend("force", opts, { desc = "Code action" }))
+          vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename,       vim.tbl_extend("force", opts, { desc = "Rename symbol" }))
+          vim.keymap.set("n", "<leader>f",  vim.lsp.buf.format,       vim.tbl_extend("force", opts, { desc = "Format buffer" }))
+        end,
       })
     end,
   },
@@ -76,10 +72,10 @@ return {
     "folke/trouble.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     keys = {
-      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics" },
+      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>",              desc = "Diagnostics" },
       { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer diagnostics" },
-      { "<leader>cs", "<cmd>Trouble symbols toggle<cr>", desc = "Symbols" },
-      { "<leader>cl", "<cmd>Trouble lsp toggle<cr>", desc = "LSP references" },
+      { "<leader>cs", "<cmd>Trouble symbols toggle<cr>",                  desc = "Symbols" },
+      { "<leader>cl", "<cmd>Trouble lsp toggle<cr>",                      desc = "LSP references" },
     },
     opts = {},
   },
