@@ -1,4 +1,14 @@
 return {
+  -- Terminal (snacks.nvim — already installed as claudecode dependency)
+  {
+    "folke/snacks.nvim",
+    optional = true,
+    keys = {
+      { "<leader>t", function() Snacks.terminal.toggle() end, desc = "Toggle terminal" },
+      { "<C-\\>",    function() Snacks.terminal.toggle() end, desc = "Toggle terminal" },
+    },
+  },
+
   -- File explorer
   {
     "nvim-neo-tree/neo-tree.nvim",
@@ -89,19 +99,6 @@ return {
     "nvim-pack/nvim-spectre",
     keys = {
       { "<leader>S", '<cmd>lua require("spectre").toggle()<cr>', desc = "Search & Replace" },
-    },
-  },
-
-  -- Terminal
-  {
-    "akinsho/toggleterm.nvim",
-    version = "*",
-    keys = { "<leader>t", "<C-\\>" },
-    opts = {
-      size = 20,
-      open_mapping = [[<C-\>]],
-      direction = "float",
-      float_opts = { border = "curved" },
     },
   },
 

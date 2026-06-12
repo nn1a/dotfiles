@@ -71,9 +71,17 @@ map("n", "<leader>gb", "<cmd>Gitsigns blame_line<cr>", { desc = "Blame line" })
 map("n", "]h", "<cmd>Gitsigns next_hunk<cr>", { desc = "Next hunk" })
 map("n", "[h", "<cmd>Gitsigns prev_hunk<cr>", { desc = "Prev hunk" })
 
--- Terminal
-map("n", "<leader>t", "<cmd>ToggleTerm<cr>", { desc = "Toggle terminal" })
+-- Terminal keymaps defined in plugins/editor.lua (snacks.nvim keys spec)
 map("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- Which-key hint
 map("n", "<leader>?", "<cmd>WhichKey<cr>", { desc = "Show keymaps" })
+
+-- Claude Code (coder/claudecode.nvim - WebSocket integration)
+-- <leader>cc  toggle terminal
+-- <leader>cf  focus terminal
+-- <leader>cm  select model
+-- <leader>cb  add current buffer
+-- <leader>cs  send selection (visual)
+-- <leader>ca  accept diff
+-- <leader>cd  deny diff

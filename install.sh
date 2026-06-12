@@ -50,8 +50,6 @@ detect_os() {
         . /etc/os-release
         case "$ID" in
           ubuntu|debian|linuxmint|pop) echo "debian" ;;
-          fedora|rhel|centos|rocky)    echo "fedora" ;;
-          arch|manjaro)                echo "arch"   ;;
           *) echo "linux" ;;
         esac
       else
@@ -151,22 +149,6 @@ install_neovim_debian() {
   sudo ln -sfn /opt/nvim/usr/bin/nvim /usr/local/bin/nvim
   rm -rf "$tmp"
   success "Neovim installed at /usr/local/bin/nvim"
-}
-
-install_neovim_fedora() {
-  if cmd_exists nvim; then
-    success "Neovim already installed ($(nvim --version | head -1))"
-    return
-  fi
-  sudo dnf install -y neovim
-}
-
-install_neovim_arch() {
-  if cmd_exists nvim; then
-    success "Neovim already installed ($(nvim --version | head -1))"
-    return
-  fi
-  sudo pacman -S --noconfirm neovim
 }
 
 # ── Core dependencies ─────────────────────────
@@ -317,56 +299,6 @@ install_deps_debian() {
   fi
 }
 
-install_deps_fedora() {
-  step "Installing dependencies (Fedora)"
-  sudo dnf install -y git curl wget unzip gcc make python3 python3-pip ripgrep fd-find nodejs npm golang
-
-  if ! cmd_exists tree-sitter; then
-    info "Installing tree-sitter-cli via npm"
-    npm install -g tree-sitter-cli
-  fi
-
-  if ! cmd_exists lazygit; then
-    info "Installing lazygit"
-    sudo dnf copr enable atim/lazygit -y
-    sudo dnf install -y lazygit
-  fi
-
-  # Rust toolchain
-  if ! cmd_exists rustup; then
-    info "Installing rustup"
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
-    source "$HOME/.cargo/env"
-  else
-    success "rustup already installed"
-  fi
-  rustup component add rust-analyzer 2>/dev/null || true
-
-  if ! cmd_exists ruff; then
-    pip3 install --user ruff
-  fi
-}
-
-install_deps_arch() {
-  step "Installing dependencies (Arch)"
-  sudo pacman -S --noconfirm git curl wget unzip base-devel python python-pip ripgrep fd lazygit nodejs npm go ruff
-
-  if ! cmd_exists tree-sitter; then
-    info "Installing tree-sitter-cli via npm"
-    npm install -g tree-sitter-cli
-  fi
-
-  # Rust toolchain
-  if ! cmd_exists rustup; then
-    info "Installing rustup"
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
-    source "$HOME/.cargo/env"
-  else
-    success "rustup already installed"
-  fi
-  rustup component add rust-analyzer 2>/dev/null || true
-}
-
 # ── Fonts ────────────────────────────────────
 install_nerd_font_macos() {
   step "Installing Nerd Font (JetBrainsMono)"
@@ -447,16 +379,6 @@ main() {
       install_neovim_debian
       install_nerd_font_linux
       ensure_path_entries
-      ;;
-    fedora)
-      install_deps_fedora
-      install_neovim_fedora
-      install_nerd_font_linux
-      ;;
-    arch)
-      install_deps_arch
-      install_neovim_arch
-      install_nerd_font_linux
       ;;
     *)
       warn "Unknown Linux variant — skipping package install. Install neovim, ripgrep, fd, lazygit, node manually."

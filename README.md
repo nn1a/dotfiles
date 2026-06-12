@@ -8,8 +8,6 @@
 |---|---|
 | macOS | Homebrew |
 | Ubuntu / Debian | apt + GitHub Releases |
-| Fedora / RHEL | dnf |
-| Arch / Manjaro | pacman |
 
 ## 설치
 
@@ -31,19 +29,19 @@ bash ~/dotfiles/install.sh
 
 ## 스크립트가 설치하는 것
 
-| 항목 | macOS | Ubuntu | Fedora | Arch |
-|---|---|---|---|---|
-| Neovim | brew | AppImage | dnf | pacman |
-| ripgrep, fd | brew | GitHub Release | dnf | pacman |
-| lazygit | brew | GitHub Release | copr | pacman |
-| Node.js | brew | NodeSource | dnf | pacman |
-| Go | brew | dl.google.com | dnf | pacman |
-| rustup + rust-analyzer | curl | curl | curl | curl |
-| ruff | brew | pip | pip | pacman |
-| tree-sitter CLI | npm | npm | npm | npm |
-| JetBrainsMono Nerd Font | brew cask | ~/.local/share/fonts | ← | ← |
-| ~/.config/nvim | symlink → ~/dotfiles/nvim | ← | ← | ← |
-| Neovim 플러그인 | lazy.nvim 자동 설치 | ← | ← | ← |
+| 항목 | macOS | Ubuntu |
+|---|---|---|
+| Neovim | brew | AppImage |
+| ripgrep, fd | brew | GitHub Release |
+| lazygit | brew | GitHub Release |
+| Node.js | brew | NodeSource |
+| Go | brew | dl.google.com |
+| rustup + rust-analyzer | curl | curl |
+| ruff | brew | pip |
+| tree-sitter CLI | npm | npm |
+| JetBrainsMono Nerd Font | brew cask | ~/.local/share/fonts |
+| ~/.config/nvim | symlink → ~/dotfiles/nvim | ← |
+| Neovim 플러그인 | lazy.nvim 자동 설치 | ← |
 
 ## 구조
 
@@ -52,21 +50,23 @@ dotfiles/
 ├── install.sh              # 설치 스크립트
 ├── nvim/                   # ~/.config/nvim 으로 심링크
 │   ├── init.lua
+│   ├── KEYMAPS.md          # 키맵 전체 문서
 │   └── lua/
 │       ├── config/
 │       │   ├── options.lua     # 기본 옵션
 │       │   └── keymaps.lua     # 키맵
 │       └── plugins/
+│           ├── ai.lua          # Claude Code (coder/claudecode.nvim)
 │           ├── colorscheme.lua # Catppuccin
-│           ├── ui.lua          # lualine, bufferline, noice, which-key
-│           ├── telescope.lua   # 파일/검색
-│           ├── treesitter.lua  # 구문 강조 (nvim-treesitter v2)
-│           ├── lsp.lua         # LSP + Mason (vim.lsp.config API)
 │           ├── completion.lua  # nvim-cmp + LuaSnip
-│           ├── editor.lua      # autopairs, surround, comment, flash…
+│           ├── editor.lua      # autopairs, surround, comment, flash, snacks terminal
 │           ├── formatting.lua  # conform + nvim-lint
 │           ├── git.lua         # lazygit, diffview, gitsigns
-│           └── rust.lua        # rustaceanvim + crates.nvim
+│           ├── lsp.lua         # LSP + Mason + trouble.nvim
+│           ├── rust.lua        # rustaceanvim + crates.nvim
+│           ├── telescope.lua   # 파일/검색
+│           ├── treesitter.lua  # 구문 강조
+│           └── ui.lua          # lualine, bufferline, noice, which-key
 └── README.md
 ```
 
@@ -85,9 +85,12 @@ dotfiles/
 | `s` | Flash 점프 |
 | `K` | LSP hover |
 | `gd` | 정의로 이동 |
-| `<Space>ca` | Code action |
 | `<Space>rn` | 심볼 이름 변경 |
 | `<Space>?` | 키맵 힌트 (which-key) |
+| `<Space>cc` | Claude Code 토글 |
+| `<Space>cs` | Claude Code 선택 영역 전송 (visual) |
+
+> 전체 키맵은 [nvim/KEYMAPS.md](nvim/KEYMAPS.md) 참조
 
 ### Rust 전용
 
